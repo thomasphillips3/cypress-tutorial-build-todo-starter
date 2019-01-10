@@ -15,9 +15,12 @@ describe('Input form', () => {
     });
 
     context('Form submission', () => {
-        it.only('Adds a new todo on submit', () => {
+        beforeEach(() => {
+            cy.server()
+        });
+
+        it('Adds a new todo on submit', () => {
             const itemText = 'slap busters';
-            cy.server();
             cy.route('POST', '/api/todos', {
                 name: itemText,
                 id: 1,
@@ -32,6 +35,24 @@ describe('Input form', () => {
             cy.get('.todo-list li')
                 .should('have.length', 1)
                 .and('contain', itemText)
+        });
+
+        it('Shows an error message on a failed submission', () => {
+            cy.route({
+                url: '/api/todos',
+                method: 'POST',
+                status: 500,
+                response: {}
+            });
+
+            cy.get('.new-todo')
+                .type('test{enter}')
+            
+            cy.get('.todo-list li')
+                .should('not.exist')
+                
+            cy.get('.error')
+                .should('be.visible')
         });
     });
 });
