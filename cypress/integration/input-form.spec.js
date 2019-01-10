@@ -5,7 +5,7 @@ describe('Input form', () => {
         cy.focused().should('have.class', 'new-todo');
     });
 
-    it.only('accepts input', () => {
+    it('accepts input', () => {
         const testText = 'smack fools';
         cy.visit('http://localhost:3030');
 
