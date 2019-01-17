@@ -1,1 +1,19 @@
-{}
+{
+  "todos": [
+    {
+      "name": "Roll down the strip on vols",
+      "isComplete": false,
+      "id": 1
+    },
+    {
+      "name": "Come up",
+      "isComplete": false,
+      "id": 2
+    },
+    {
+      "name": "Slam Cadillac doors",
+      "isComplete": false,
+      "id": 3
+    }
+  ]
+}
