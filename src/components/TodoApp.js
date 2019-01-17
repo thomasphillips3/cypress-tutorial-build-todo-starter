@@ -1,9 +1,9 @@
-import React, {Component} from 'react'
-import {BrowserRouter as Router, Route} from 'react-router-dom'
+import React, { Component } from 'react'
+import { BrowserRouter as Router, Route } from 'react-router-dom'
 import TodoForm from './TodoForm'
 import TodoList from './TodoList'
 import Footer from './Footer'
-import { saveTodo, loadTodos } from '../lib/service';
+import { saveTodo, loadTodos, destroyTodo } from '../lib/service'
 
 
 export default class TodoApp extends Component {
@@ -14,47 +14,55 @@ export default class TodoApp extends Component {
       currentTodo: '',
       todos: []
     }
-    this.handleNewTodoChange = this.handleNewTodoChange.bind(this);
-    this.handleTodoSubmit = this.handleTodoSubmit.bind(this);
+    this.handleNewTodoChange = this.handleNewTodoChange.bind(this)
+    this.handleTodoSubmit = this.handleTodoSubmit.bind(this)
+    this.handleDelete = this.handleDelete.bind(this)
   }
 
   componentDidMount() {
     loadTodos()
-      .then(({data}) => this.setState({todos: data}))
-      .catch(() => {this.setState({ error: true})})
+      .then(({ data }) => this.setState({ todos: data }))
+      .catch(() => this.setState({ error: true }))
   }
 
   handleNewTodoChange(event) {
-    this.setState({ currentTodo: event.target.value });
+    this.setState({ currentTodo: event.target.value })
+  }
+
+  handleDelete(id) {
+    destroyTodo(id)
+      .then(() => this.setState({
+        todos: this.state.todos.filter(t => t.id !== id)
+      }))
   }
 
   handleTodoSubmit(event) {
     event.preventDefault()
-    const newTodo = { name: this.state.currentTodo, isComplete: false };
-
+    const newTodo = { name: this.state.currentTodo, isComplete: false }
     saveTodo(newTodo)
       .then(({ data }) => this.setState({
         todos: this.state.todos.concat(data),
         currentTodo: ''
       }))
-      .catch(() => this.setState({ error: true }));
+      .catch(() => this.setState({ error: true }))
   }
 
-  render () {
-    const remaining = this.state.todos.filter(t => !t.isComplete).length;
+  render() {
+    const remaining = this.state.todos.filter(t => !t.isComplete).length
     return (
       <Router>
         <div>
           <header className="header">
             <h1>todos</h1>
-            {this.state.error ? <span className='error'>Damnit!</span>: null}
-            <TodoForm 
+            {this.state.error ? <span className='error'>Oh no!</span> : null}
+            <TodoForm
               currentTodo={this.state.currentTodo}
-              handleNewTodoChange={this.handleNewTodoChange}
-              handleTodoSubmit={this.handleTodoSubmit} />
+              handleTodoSubmit={this.handleTodoSubmit}
+              handleNewTodoChange={this.handleNewTodoChange} />
           </header>
           <section className="main">
-            <TodoList todos={this.state.todos} />
+            <TodoList todos={this.state.todos}
+              handleDelete={this.handleDelete} />
           </section>
           <Footer remaining={remaining} />
         </div>
