@@ -47,7 +47,7 @@ describe('Smoke tests', () => {
         .should('have.length', 4)
     });
 
-    it.only('Deletes todos', () => {
+    it('Deletes todos', () => {
       cy.server()
       cy.route('DELETE', '/api/todos/*')
         .as('delete')
@@ -61,6 +61,31 @@ describe('Smoke tests', () => {
           
           cy.wait('@delete')
         }).should('not.exist');
-    })
+    });
+
+    it('Toogles todos', () => {
+      const clickAndWait = ($el) => {
+        cy.wrap($el)
+          .as('item')
+          .find('.toggle')
+          .click()
+
+        cy.wait('@update')
+      }
+      cy.server()
+      cy.route('PUT', '/api/todos/*')
+        .as('update')
+
+      cy.get('.todo-list li')
+        .each($el => {
+          clickAndWait($el)
+          cy.get('@item')
+            .should('have.class', 'completed')
+      }).each($el => {
+          clickAndWait($el)
+          cy.get('@item')
+            .should('not.have.class', 'completed')
+      });
+    });
   });
 });
